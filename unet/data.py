@@ -13,11 +13,14 @@
 # limitations under the License.
 
 import tensorflow as tf
+import tensorflow_datasets as tfds
+
 
 IMG_HEIGHT, IMG_WIDTH, IMG_CHANNEL = 128, 128, 3
 IMG_SIZE = (IMG_HEIGHT, IMG_WIDTH)
 IMG_SHAPE = (IMG_HEIGHT, IMG_WIDTH, IMG_CHANNEL)
 OUTPUT_CLASSES, VAL_SUBSPLITS = 3, 5
+BATCH_SIZE, BUFFER_SIZE = 32, 1000
 
 
 class Augment(tf.keras.layers.Layer):
@@ -97,3 +100,47 @@ def load_image(
     input_image, input_mask = normalize(input_image, input_mask)
 
     return input_image, input_mask
+
+
+def load_data(
+    data_dir: str,
+    batch_size: int = BATCH_SIZE,
+    buffer_size: int = BUFFER_SIZE,
+) -> tuple[tf.data.Dataset, tf.data.Dataset, tfds.core.DatasetInfo]:
+    """Load and preprocess data.
+
+    Args:
+        data_dir (str): Data directory.
+        batch_size (int, optional): Mini batch size. Defaults to BATCH_SIZE.
+        buffer_size (int, optional): Buffer size. Defaults to BUFFER_SIZE.
+
+    Returns:
+        tuple[tf.data.Dataset, tf.data.Dataset, tfds.core.DatasetInfo]:
+            Training and validation dataset and dataset info.
+    """
+    # Download and load dataset.
+    dataset, info = tfds.load(
+        'oxford_iiit_pet:3.*.*',
+        with_info=True,
+        data_dir=data_dir,
+    )
+
+    # Split into train & test set.
+    train_images = dataset['train'].map(load_image,
+                                        num_parallel_calls=tf.data.AUTOTUNE)
+    test_images = dataset['test'].map(load_image,
+                                      num_parallel_calls=tf.data.AUTOTUNE)
+
+    # Preprocess data.
+    train_batches = (
+        train_images
+        .cache()
+        .shuffle(buffer_size)
+        .batch(batch_size)
+        .repeat()
+        .map(Augment())
+        .prefetch(buffer_size=tf.data.AUTOTUNE)
+    )
+    test_batches = test_images.batch(batch_size)
+
+    return train_batches, test_batches, info

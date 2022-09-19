@@ -12,9 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import tensorflow as tf
 
-from unet.data import IMG_SHAPE, OUTPUT_CLASSES
+from unet.data import BATCH_SIZE, IMG_SHAPE, OUTPUT_CLASSES
+
+EPOCHS, LEARNING_RATE = 20, 1e-3
+SAVE_FREQ = 5 * BATCH_SIZE
 
 
 class Encoder(tf.keras.layers.Layer):
@@ -34,11 +38,11 @@ class Encoder(tf.keras.layers.Layer):
 
         # Use the activations of these layers.
         layer_names = [
-          'block_1_expand_relu',   # 64x64
-          'block_3_expand_relu',   # 32x32
-          'block_6_expand_relu',   # 16x16
-          'block_13_expand_relu',  # 8x8
-          'block_16_project',      # 4x4
+            'block_1_expand_relu',   # 64x64
+            'block_3_expand_relu',   # 32x32
+            'block_6_expand_relu',   # 16x16
+            'block_13_expand_relu',  # 8x8
+            'block_16_project',      # 4x4
         ]
 
         model_output = [model.get_layer(name).output
@@ -92,14 +96,14 @@ class UNet(tf.keras.Model):
 
         # Decoder (upsampler).
         self.decoder_stack = [tf.keras.Sequential([
-          tf.keras.layers.Conv2DTranspose(
-            filters, kernel_size=3, strides=2,
-            padding='same', use_bias=False,
-            kernel_initializer=initializer,
-          ),
-          tf.keras.layers.BatchNormalization(),
-          tf.keras.layers.Dropout(dropout),
-          tf.keras.layers.ReLU(),
+            tf.keras.layers.Conv2DTranspose(
+                filters, kernel_size=3, strides=2,
+                padding='same', use_bias=False,
+                kernel_initializer=initializer,
+            ),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dropout(dropout),
+            tf.keras.layers.ReLU(),
         ]) for filters in decoder_filters]
 
         # Final (output) layer.
@@ -136,3 +140,57 @@ class UNet(tf.keras.Model):
         # This is the last layer of the model
         output = self.output_layer(x)
         return output
+
+
+def create_model(summary: bool = True) -> tf.keras.Model:
+    """Create the U-Net convolutional neural network model.
+
+    Args:
+        summary (bool, optional): Display model summary. Defaults to False.
+
+    Returns:
+        tf.keras.Model: Compiled U-Net model.
+    """
+    model = UNet(input_shape=IMG_SHAPE, output_channels=OUTPUT_CLASSES)
+
+    model.compile(
+        optimizer=tf.keras.optimizers.Adam(learning_rate=LEARNING_RATE),
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        metrics=['accuracy'],
+    )
+
+    if summary:
+        model.build(input_shape=[None, *IMG_SHAPE])
+        model.summary()
+
+    return model
+
+
+def save_model(model: tf.keras.Model, save_path: str) -> None:
+    """Save the model to a file.
+
+    Args:
+        model (tf.keras.Model): Model to save.
+        save_path (str): Path to save the model.
+    """
+    os.makedirs(save_path, exist_ok=True)
+    model.save(save_path, save_format='tf')
+
+
+def save_model_as_tflite(
+    model: tf.keras.Model, save_path: str,
+) -> None:
+    """Save the model as a TensorFlow Lite model.
+
+    Args:
+        model (tf.keras.Model): Model to save.
+        save_path (str): Path to save the model.
+    """
+    # Create save directory (if it doesn't exist).
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+
+    # Create a converter.
+    converter = tf.lite.TFLiteConverter.from_keras_model(model)
+    tflite_model = converter.convert()
+    with open(save_path, 'wb') as f:
+        f.write(tflite_model)

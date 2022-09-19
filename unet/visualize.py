@@ -65,3 +65,52 @@ def display(
         plt.axis('off')
 
     plt.show()
+
+
+def create_mask(pred_mask: tf.TensorArray) -> tf.TensorArray:
+    """Create image mask with predicted output.
+
+    Args:
+        pred_mask (tf.TensorArray): Predicted image mask with shape
+            [batch_size, img_height, img_width, img_channel].
+
+    Returns:
+        tf.TensorArray - Prediction mask with shape
+            [img_height, img_width, img_channel]
+    """
+    pred_mask = tf.math.argmax(pred_mask, axis=-1)
+    pred_mask = pred_mask[..., tf.newaxis]
+
+    return pred_mask[0]
+
+
+def predict(images: tf.TensorArray, model: tf.keras.Model) -> None:
+    """Predict image mask.
+
+    Args:
+        data (tf.TensorArray): Image to predict with shape
+            [batch_size, img_height, img_width, img_channel].
+        model (tf.keras.Model): Model to use for prediction.
+    """
+    pred_mask = model.predict(images)
+    pred_mask = create_mask(pred_mask)
+    return pred_mask
+
+
+def show_predictions(
+    model: tf.keras.Model,
+    dataset: tf.data.Dataset,
+    num: int = 1
+) -> None:
+    """Display image, image mask and predicted mask.
+
+    Args:
+        model (tf.keras.Model, optional): Model to use for prediction.
+        dataset (tf.data.Dataset, optional): Dataset containing
+            image & image mask.
+            Each with shape [batch_size, img_height, img_width, img_channel].
+        num (int): Number of images triples to display. Defaults to 1.
+    """
+    for image, mask in dataset.take(num):
+        pred_mask = model.predict(image)
+        display([image[0], mask[0], create_mask(pred_mask)])
