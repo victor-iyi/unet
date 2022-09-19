@@ -1,0 +1,13 @@
+# Machine learning (Apple Silicon)
+# tensorflow
+tensorflow-datasets
+
+# Apple silicon users only.
+tensorflow-macos
+tensorflow-metal
+
+# Image & data visualization
+matplotlib
+
+# Optional
+pydot
