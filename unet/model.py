@@ -17,6 +17,7 @@ import tensorflow as tf
 
 from unet.data import BATCH_SIZE, IMG_SHAPE, OUTPUT_CLASSES
 
+# Hyperparameters.
 EPOCHS, LEARNING_RATE = 20, 1e-3
 SAVE_FREQ = 5 * BATCH_SIZE
 
@@ -173,7 +174,10 @@ def save_model(model: tf.keras.Model, save_path: str) -> None:
         model (tf.keras.Model): Model to save.
         save_path (str): Path to save the model.
     """
+    # Create save dir (if it doesn't exist).
     os.makedirs(save_path, exist_ok=True)
+
+    # Save the model in TF format rather than h5.
     model.save(save_path, save_format='tf')
 
 
@@ -192,5 +196,7 @@ def save_model_as_tflite(
     # Create a converter.
     converter = tf.lite.TFLiteConverter.from_keras_model(model)
     tflite_model = converter.convert()
+
+    # Save the TFLite model to `save_path`.
     with open(save_path, 'wb') as f:
         f.write(tflite_model)

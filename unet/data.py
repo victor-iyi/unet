@@ -65,7 +65,7 @@ def normalize(
     input_image: tf.TensorArray,
     input_mask: tf.TensorArray
 ) -> tuple[tf.TensorArray, tf.TensorArray]:
-    """Normalize image & image mask.
+    """Normalize image in range [0, 1] & image mask in range [0, 2].
 
     Arguments:
         input_image (tf.TensorArray): Input image in range [0, 255].
@@ -134,11 +134,11 @@ def load_data(
     # Preprocess data.
     train_batches = (
         train_images
+        .map(Augment())
         .cache()
         .shuffle(buffer_size)
         .batch(batch_size)
         .repeat()
-        .map(Augment())
         .prefetch(buffer_size=tf.data.AUTOTUNE)
     )
     test_batches = test_images.batch(batch_size)

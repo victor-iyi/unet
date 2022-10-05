@@ -61,15 +61,18 @@ def main() -> int:
     train_dataset, val_dataset, info = load_data(
         data_dir=DATA_DIR,
     )
+
+    # Estimate how many train steps to take per epoch.
     train_length = info.splits['train'].num_examples
     val_steps = info.splits['test'].num_examples // BATCH_SIZE // VAL_SUBSPLITS
     steps_per_epoch = train_length // BATCH_SIZE
 
-    # Build model.
+    # Build (and compile) model.
     model = create_model(summary=True)
 
     # Callbacks: ModelCheckpoint, TensorBoard, EarlyStopping.
     callbacks = [
+        # create checkpoints during training.
         tf.keras.callbacks.ModelCheckpoint(
             filepath=MODEL_CKPT,
             save_best_only=True,
@@ -77,9 +80,11 @@ def main() -> int:
             save_freq=SAVE_FREQ,
             verbose=1,
         ),
+        # Log training metrics to tensorboard.
         tf.keras.callbacks.TensorBoard(
             log_dir=LOG_DIR,
         ),
+        # stop if validation loss doesn't improve.
         tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
             patience=5,
