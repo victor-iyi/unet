@@ -16,6 +16,8 @@
 
 # U-Net: Convolutional Neural Networks for Image Segmentation
 
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/victor-iyi/unet/master.svg)](https://results.pre-commit.ci/latest/github/victor-iyi/unet/master)
+
 The [U-Net] is a convolutional network architecture for fast and precise segmentation of images.
 
 ![U-Net Architecture](res/u-net-architecture.png)

@@ -1,4 +1,10 @@
 autopep8
-pycodestyle
-mypy
+covdefaults
+flake8
 jupyterlab
+mypy
+pre-commit
+pycodestyle
+pytest
+pytest-cov
+tox
