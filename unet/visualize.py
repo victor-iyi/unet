@@ -11,9 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import tensorflow as tf
 import matplotlib.pyplot as plt
+import tensorflow as tf
 
 
 def visualize_training(
@@ -46,7 +45,7 @@ def visualize_training(
 
 def display(
     images: list[tf.TensorArray],
-    figsize: tuple[int, int] = (10, 10)
+    figsize: tuple[int, int] = (10, 10),
 ) -> None:
     """Display images in a grid.
 
@@ -84,13 +83,17 @@ def create_mask(pred_mask: tf.TensorArray) -> tf.TensorArray:
     return pred_mask[0]
 
 
-def predict(images: tf.TensorArray, model: tf.keras.Model) -> None:
+def predict(images: tf.TensorArray, model: tf.keras.Model) -> tf.TensorArray:
     """Predict image mask.
 
     Args:
         data (tf.TensorArray): Image to predict with shape
             [batch_size, img_height, img_width, img_channel].
         model (tf.keras.Model): Model to use for prediction.
+
+    Returns:
+        tf.TensorArray - Prediction mask with shape
+            [img_height, img_width, img_channel]
     """
     pred_mask = model.predict(images)
     pred_mask = create_mask(pred_mask)
@@ -100,7 +103,7 @@ def predict(images: tf.TensorArray, model: tf.keras.Model) -> None:
 def show_predictions(
     model: tf.keras.Model,
     dataset: tf.data.Dataset,
-    num: int = 1
+    num: int = 1,
 ) -> None:
     """Display image, image mask and predicted mask.
 

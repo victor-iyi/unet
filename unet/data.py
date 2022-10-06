@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import tensorflow as tf
 import tensorflow_datasets as tfds
 
@@ -63,7 +62,7 @@ class Augment(tf.keras.layers.Layer):
 
 def normalize(
     input_image: tf.TensorArray,
-    input_mask: tf.TensorArray
+    input_mask: tf.TensorArray,
 ) -> tuple[tf.TensorArray, tf.TensorArray]:
     """Normalize image in range [0, 1] & image mask in range [0, 2].
 
@@ -83,7 +82,7 @@ def normalize(
 
 
 def load_image(
-    datapoint: dict[str, tf.Tensor]
+    datapoint: dict[str, tf.Tensor],
 ) -> tuple[tf.TensorArray, tf.TensorArray]:
     """Resize and normalize image and image mask.
 
@@ -126,10 +125,14 @@ def load_data(
     )
 
     # Split into train & test set.
-    train_images = dataset['train'].map(load_image,
-                                        num_parallel_calls=tf.data.AUTOTUNE)
-    test_images = dataset['test'].map(load_image,
-                                      num_parallel_calls=tf.data.AUTOTUNE)
+    train_images = dataset['train'].map(
+        load_image,
+        num_parallel_calls=tf.data.AUTOTUNE,
+    )
+    test_images = dataset['test'].map(
+        load_image,
+        num_parallel_calls=tf.data.AUTOTUNE,
+    )
 
     # Preprocess data.
     train_batches = (

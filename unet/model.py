@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import os
+
 import tensorflow as tf
 
-from unet.data import BATCH_SIZE, IMG_SHAPE, OUTPUT_CLASSES
+from unet.data import BATCH_SIZE
+from unet.data import IMG_SHAPE
+from unet.data import OUTPUT_CLASSES
 
 # Hyperparameters.
 EPOCHS, LEARNING_RATE = 20, 1e-3
@@ -46,10 +48,14 @@ class Encoder(tf.keras.layers.Layer):
             'block_16_project',      # 4x4
         ]
 
-        model_output = [model.get_layer(name).output
-                        for name in layer_names]
-        self.encoder_model = tf.keras.Model(inputs=model.input,
-                                            outputs=model_output)
+        model_output = [
+            model.get_layer(name).output
+            for name in layer_names
+        ]
+        self.encoder_model = tf.keras.Model(
+            inputs=model.input,
+            outputs=model_output,
+        )
         self.encoder_model.trainable = False
 
     def call(
@@ -65,7 +71,8 @@ class Encoder(tf.keras.layers.Layer):
         Returns:
           tf.TensorArray - List of encoded output from each layer of interest.
         """
-        return self.encoder_model(x)
+        output: list[tf.TensorArray] = self.encoder_model(x, training=training)
+        return output
 
 
 class UNet(tf.keras.Model):
@@ -96,16 +103,18 @@ class UNet(tf.keras.Model):
         self.concat = tf.keras.layers.Concatenate()
 
         # Decoder (upsampler).
-        self.decoder_stack = [tf.keras.Sequential([
-            tf.keras.layers.Conv2DTranspose(
-                filters, kernel_size=3, strides=2,
-                padding='same', use_bias=False,
-                kernel_initializer=initializer,
-            ),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dropout(dropout),
-            tf.keras.layers.ReLU(),
-        ]) for filters in decoder_filters]
+        self.decoder_stack = [
+            tf.keras.Sequential([
+                tf.keras.layers.Conv2DTranspose(
+                    filters, kernel_size=3, strides=2,
+                    padding='same', use_bias=False,
+                    kernel_initializer=initializer,
+                ),
+                tf.keras.layers.BatchNormalization(),
+                tf.keras.layers.Dropout(dropout),
+                tf.keras.layers.ReLU(),
+            ]) for filters in decoder_filters
+        ]
 
         # Final (output) layer.
         self.output_layer = tf.keras.layers.Conv2DTranspose(

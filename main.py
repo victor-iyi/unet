@@ -11,19 +11,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import os
+
 import tensorflow as tf
 
+from unet.data import BATCH_SIZE
 from unet.data import load_data
-from unet.data import BATCH_SIZE, VAL_SUBSPLITS
-
+from unet.data import VAL_SUBSPLITS
 from unet.model import create_model
-from unet.model import EPOCHS, SAVE_FREQ
-from unet.model import save_model, save_model_as_tflite
-
-from unet.visualize import visualize_training
+from unet.model import EPOCHS
+from unet.model import SAVE_FREQ
+from unet.model import save_model
+from unet.model import save_model_as_tflite
 from unet.visualize import show_predictions
+from unet.visualize import visualize_training
 
 # Base directories.
 BASE_DIR = os.path.dirname(__file__)
@@ -38,8 +39,10 @@ DATA_DIR = os.path.join(BASE_DIR, 'data')
 UNET_DIR = os.path.join(SAVED_MODELS, 'unet')
 
 # Model checkpoint during training.
-MODEL_CKPT = os.path.join(UNET_DIR,
-                          'train/unet-{epoch:03d}.ckpt')
+MODEL_CKPT = os.path.join(
+    UNET_DIR,
+    'train/unet-{epoch:03d}.ckpt',
+)
 # os.makedirs(os.path.dirname(MODEL_CKPT),
 #             exist_ok=True)
 
