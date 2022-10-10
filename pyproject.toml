@@ -38,28 +38,28 @@ python = "^3.9"
 
 # TensorFlow datasets.
 tensorflow-datasets = "*"
+# TensorFlow for win32 and linux
+tensorflow = { version = "*", markers = "sys_platform != 'darwin'" }
 # TensorFlow for MacOS
-tensorflow-macos = "*"
+tensorflow-macos = { version = "*", markers = "sys_platform == 'darwin'" }
 # TensoorFlow Metal acceleration
-tensorflow-metal = "*"
+tensorflow-metal = { version = "*", optional = true, markers = "sys_platform == 'darwin'" }
 # Data visulaization.
 matplotlib = "*"
 # Model summary plot [optional]
-pydot = "*"
+pydot = {version = "*", optional = true }
 
 [tool.poetry.dev-dependencies]
 # Automatically format Python code to PEP 8 style guide.
 autopep8 = "*"
 # A coverage plugin to provide sensible default settings.
-covdefaults = "^2.2.0"
+covdefaults = { version = "^2.2.0", optional = true }
 # The modular source checker.
-flake8 = "*"
+flake8 = { version = "*", optional = true }
 # Optional static typing for Python.
-mypy = "^0.982"
+mypy = { version = "^0.982", optional = true }
 # Python Enhancement Proposal style guide standard.
 pep8 = "^1.7.1"
-# REPL editor environment for data science.
-# juypterlab = "^3.4.8"
 # Managing and maintaining multi-language pre-commit hooks.
 pre-commit = "^2.20.0"
 # Python style guide checker.
@@ -71,7 +71,7 @@ pytest-cov = "^4.0.0"
 # Python linter.
 pylint = "^2.15.3"
 # Generic viirtualenv management and test cli tool.
-tox = "^3.26.0"
+tox = { version = "^3.26.0", optional = true }
 
 
 [tool.poetry.scripts]
