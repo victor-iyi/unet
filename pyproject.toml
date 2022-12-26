@@ -29,7 +29,7 @@ classifiers = [
 ]
 
 packages = [
-  { include = "unet" },
+  { include = "unet", from = "src" },
 ]
 
 [tool.poetry.dependencies]
