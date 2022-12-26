@@ -14,7 +14,6 @@
 import os
 
 import tensorflow as tf
-
 from unet.data import BATCH_SIZE
 from unet.data import IMG_SHAPE
 from unet.data import OUTPUT_CLASSES
@@ -32,8 +31,9 @@ class Encoder(tf.keras.layers.Layer):
 
         Args:
           input_shape (tuple[int, int, int]): Image input shape.
+
         """
-        super(Encoder, self).__init__()
+        super().__init__()
 
         model = tf.keras.applications.MobileNetV2(
             input_shape=input_shape, include_top=False,
@@ -70,6 +70,7 @@ class Encoder(tf.keras.layers.Layer):
 
         Returns:
           tf.TensorArray - List of encoded output from each layer of interest.
+
         """
         output: list[tf.TensorArray] = self.encoder_model(x, training=training)
         return output
@@ -92,7 +93,7 @@ class UNet(tf.keras.Model):
             Defaults to OUTPUT_CLASSES.
           dropout (float): Dropout rate. Defaults to 0.5.
         """
-        super(UNet, self).__init__()
+        super().__init__()
         self.encoder = Encoder(input_shape=input_shape)
 
         # Don't train the encoer.
@@ -134,6 +135,7 @@ class UNet(tf.keras.Model):
 
         Returns:
           tf.TensorArray - Predicted output image mask.
+
         """
         # Downsampling.
         encoder_outputs = self.encoder(inputs)
@@ -160,6 +162,7 @@ def create_model(summary: bool = True) -> tf.keras.Model:
 
     Returns:
         tf.keras.Model: Compiled U-Net model.
+
     """
     model = UNet(input_shape=IMG_SHAPE, output_channels=OUTPUT_CLASSES)
 
@@ -182,6 +185,7 @@ def save_model(model: tf.keras.Model, save_path: str) -> None:
     Args:
         model (tf.keras.Model): Model to save.
         save_path (str): Path to save the model.
+
     """
     # Create save dir (if it doesn't exist).
     os.makedirs(save_path, exist_ok=True)
@@ -198,6 +202,7 @@ def save_model_as_tflite(
     Args:
         model (tf.keras.Model): Model to save.
         save_path (str): Path to save the model.
+
     """
     # Create save directory (if it doesn't exist).
     os.makedirs(os.path.dirname(save_path), exist_ok=True)

@@ -30,8 +30,9 @@ class Augment(tf.keras.layers.Layer):
 
         Args:
             seed (int, optional): Random seed number. Defaults to 42.
+
         """
-        super(Augment, self).__init__()
+        super().__init__()
 
         # Both use the same seed, so they'll make the same random changes.
         self.augment_inputs = tf.keras.layers.RandomFlip(
@@ -52,6 +53,7 @@ class Augment(tf.keras.layers.Layer):
 
         Returns:
             tuple[tf.Tensor, tf.Tensor]: Augmented image and image mask.
+
         """
 
         inputs = self.augment_inputs(inputs)
@@ -74,6 +76,7 @@ def normalize(
         tuple[tf.TensorArray, tf.TensorArray]:
             Normalized image in range [0, 1] and normalized image
             mask in range [0, 2].
+
     """
     input_image = tf.cast(input_image, tf.float32) / 255.0
     input_mask -= 1
@@ -92,6 +95,7 @@ def load_image(
     Returns:
         tuple[tf.TensorArray, tf.TensorArray]:
             Resized & normalized image & image mask.
+
     """
     input_image = tf.image.resize(datapoint['image'], IMG_SIZE)
     input_mask = tf.image.resize(datapoint['segmentation_mask'], IMG_SIZE)
@@ -116,6 +120,7 @@ def load_data(
     Returns:
         tuple[tf.data.Dataset, tf.data.Dataset, tfds.core.DatasetInfo]:
             Training and validation dataset and dataset info.
+
     """
     # Download and load dataset.
     dataset, info = tfds.load(

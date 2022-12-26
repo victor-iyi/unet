@@ -14,7 +14,6 @@
 import os
 
 import tensorflow as tf
-
 from unet.data import BATCH_SIZE
 from unet.data import load_data
 from unet.data import VAL_SUBSPLITS
@@ -73,6 +72,7 @@ def main() -> int:
 
     Returns:
         int: Error code. 0 if successful.
+
     """
     # Load data.
     train_dataset, val_dataset, info = load_data(

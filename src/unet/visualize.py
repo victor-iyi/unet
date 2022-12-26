@@ -25,6 +25,7 @@ def visualize_training(
         history (tf.keras.callbacks.History): Training history.
         title (str, optional): Title of the plot.
             Defaults to 'Training History'.
+
     """
     loss = history.history['loss']
     val_loss = history.history['val_loss']
@@ -52,6 +53,7 @@ def display(
     Args:
         images (list[tf.TensorArray]): List of image(s) to display.
         figsize (tuple[int, int], optional): Figure size.
+
     """
     plt.figure(figsize=figsize)
 
@@ -77,6 +79,7 @@ def create_mask(pred_mask: tf.TensorArray) -> tf.TensorArray:
     Returns:
         tf.TensorArray - Prediction mask with shape
             [img_height, img_width, img_channel]
+
     """
     pred_mask = tf.math.argmax(pred_mask, axis=-1)
     pred_mask = pred_mask[..., tf.newaxis]
@@ -95,6 +98,7 @@ def predict(images: tf.TensorArray, model: tf.keras.Model) -> tf.TensorArray:
     Returns:
         tf.TensorArray - Prediction mask with shape
             [img_height, img_width, img_channel]
+
     """
     pred_mask = model.predict(images)
     pred_mask = create_mask(pred_mask)
@@ -114,6 +118,7 @@ def show_predictions(
             image & image mask.
             Each with shape [batch_size, img_height, img_width, img_channel].
         num (int): Number of images triples to display. Defaults to 1.
+
     """
     for image, mask in dataset.take(num):
         pred_mask = model.predict(image)
