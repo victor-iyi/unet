@@ -23,8 +23,17 @@ from unet.model import EPOCHS
 from unet.model import SAVE_FREQ
 from unet.model import save_model
 from unet.model import save_model_as_tflite
-from unet.visualize import show_predictions
-from unet.visualize import visualize_training
+try:
+    from unet.visualize import show_predictions
+    from unet.visualize import visualize_training
+except ImportError:
+    import sys
+
+    sys.stderr.write('Error: Couldn\'t import matplotlib.\n')
+    sys.stderr.write('Run: `pip install "unet[plot]"`')
+    sys.stderr.write(' or `poetry install --with plot`\n')
+
+    raise SystemExit("Error: Couldn't import matplotlib.")
 
 # Base directories.
 BASE_DIR = os.path.dirname(__file__)
@@ -60,6 +69,11 @@ TF_LITE_MODEL = os.path.join(UNET_DIR, 'unet.tflite')
 
 
 def main() -> int:
+    """Main function.
+
+    Returns:
+        int: Error code. 0 if successful.
+    """
     # Load data.
     train_dataset, val_dataset, info = load_data(
         data_dir=DATA_DIR,
