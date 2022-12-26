@@ -51,6 +51,7 @@ def display(
 
     Args:
         images (list[tf.TensorArray]): List of image(s) to display.
+        figsize (tuple[int, int], optional): Figure size.
     """
     plt.figure(figsize=figsize)
 
