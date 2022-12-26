@@ -19,7 +19,6 @@ classifiers = [
   "Intended Audience :: Developers",
   "Intended Audience :: Education",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: Apache 2.0",
   "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3",
@@ -36,43 +35,24 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.9"
 
-# TensorFlow datasets.
-tensorflow-datasets = "*"
-# TensorFlow for win32 and linux
-tensorflow = { version = "*", markers = "sys_platform != 'darwin'" }
+# TensorFlow for all platforms except MacOS.
+tensorflow = {version = "^2.11.0", python = ">=3.9,<3.11", markers = "sys_platform != 'darwin'"}
 # TensorFlow for MacOS
-tensorflow-macos = { version = "*", markers = "sys_platform == 'darwin'" }
+tensorflow-macos = {version = "^2.11.0", python = ">=3.9,<3.11", platform = "darwin"}
 # TensoorFlow Metal acceleration
-tensorflow-metal = { version = "*", optional = true, markers = "sys_platform == 'darwin'" }
+tensorflow-metal = {version = "^0.7.0", optional = true, python = ">=3.9,<3.11", platform = "darwin"}
+# TensorFlow datasets.
+tensorflow-datasets = "^4.8.0"
+# Model summary plot [optional].
+pydot = {version = "^1.4.2", optional = true}
 # Data visulaization.
-matplotlib = "*"
-# Model summary plot [optional]
-pydot = {version = "*", optional = true }
+matplotlib = {version = "^3.6.2", optional = true}
 
-[tool.poetry.dev-dependencies]
-# Automatically format Python code to PEP 8 style guide.
-autopep8 = "*"
-# A coverage plugin to provide sensible default settings.
-covdefaults = { version = "^2.2.0", optional = true }
-# The modular source checker.
-flake8 = { version = "*", optional = true }
-# Optional static typing for Python.
-mypy = { version = "^0.982", optional = true }
-# Python Enhancement Proposal style guide standard.
-pep8 = "^1.7.1"
-# Managing and maintaining multi-language pre-commit hooks.
-pre-commit = "^2.20.0"
-# Python style guide checker.
-pydocstyle = "^6.1.1"
-# Simple powerful testing with Python.
-pytest = "^7.1.3"
-# Python plugin for measuring coverage.
-pytest-cov = "^4.0.0"
-# Python linter.
-pylint = "^2.15.3"
-# Generic viirtualenv management and test cli tool.
-tox = { version = "^3.26.0", optional = true }
-
+[tool.poetry.extras]
+# Enable TensorFlow Metal acceleration.
+silicon = ["tensorflow-metal"]
+# Enable model summary plot & visulaization.
+plot = ["matplotlib", "pydot"]
 
 [tool.poetry.scripts]
 unet = "main:main"
@@ -80,35 +60,103 @@ unet = "main:main"
 [tool.poetry.urls]
 "Bug Tracker" = "https://github.com/victor-iyi/unet/issues"
 
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+# Automatically format Python code to PEP 8 style guide.
+autopep8 = "^2.0.1"
+# The modular source checker.
+flake8 = "^6.0.0"
+# Optional static typing for Python.
+mypy = "^0.991"
+# Managing and maintaining multi-language pre-commit hooks.
+pre-commit = "^2.21.0"
+# Generic viirtualenv management and test cli tool.
+tox = {version = "^4.0.18", python = "^3.9"}
+# Python style guide checker.
+pydocstyle = {version = "^6.1.1", extras = ["toml"]}
+# Formats docstring to follow PEP 257.
+docformatter = {version = "^1.5.1", extras=["tomli"]}
+
+[tool.poetry.group.test]
+optional = true
+
+[tool.poetry.group.test.dependencies]
+# Simple powerful testing with Python.
+pytest = "^7.2.0"
+# Python plugin for measuring coverage.
+pytest-cov = "^4.0.0"
+# A coverage plugin to provide sensible default settings.
+covdefaults = "^2.2.2"
+
 # Poetry build system. See: https://python-poetry.org/docs/pyproject/
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+  "ignore::DeprecationWarning",
+]
+
+[tool.autopep8]
+recursive = true
+diff = true
+# in-place = true
+max-line-length = 120
+aggresive = 3
+
+[tool.docformatter]
+in-place = true
+recursive = true
+blank = true
+close-quotes-on-newline = true
+
+[tool.pydocstyle]
+convention = "google"
+add_ignore = [
+  # Missing docstring in public module.
+  "D100",
+  # Missing docstring in public class.
+  "D101",
+  # Missing docstring in public package.
+  "D104",
+  # No blank line allowed after function docstring.
+  "D202",
+  # 1 blank line required between summary line and description.
+  "D208",
+  # First line should end with a period, question mark, or exclamation point.
+  "D415",
+]
+
 [tool.mypy]
 files = "unet"
+namespace_packages = true
+explicit_package_bases = true
+strict = true
 check_untyped_defs = true
 ignore_missing_imports = true
 disallow_any_generics = true
 disallow_incomplete_defs = true
-disallow_untyped_defs = true
+implicit_reexport = false
 no_implicit_optional = true
 show_error_codes = true
 show_column_numbers = true
-show_error_context = true
 warn_unused_configs = true
 warn_unused_ignores = true
-warn_redundant_casts = true
 warn_return_any = true
 warn_unreachable = true
+disallow_subclassing_any = false
+disallow_untyped_decorators = false
 
 [tool.coverage.report]
 exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if TYPE_CHECKING:",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
+  "pragma: no cover",
+  "def __repr__",
+  "if TYPE_CHECKING:",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
 ]
 
 [tool.coverage.run]
