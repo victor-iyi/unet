@@ -131,7 +131,7 @@ add_ignore = [
 ]
 
 [tool.mypy]
-files = "unet"
+files = "src"
 namespace_packages = true
 explicit_package_bases = true
 strict = true
