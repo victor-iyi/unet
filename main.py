@@ -94,7 +94,7 @@ def main() -> int:
             filepath=MODEL_CKPT,
             save_best_only=True,
             save_weights_only=True,
-            save_freq=SAVE_FREQ,
+            save_freq=SAVE_FREQ,  # pyright: reportGeneralTypeIssues=false
             verbose=1,
         ),
         # Log training metrics to tensorboard.
